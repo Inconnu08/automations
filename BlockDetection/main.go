@@ -20,7 +20,8 @@ type NginxBlock struct {
 	TotalBlocksInside int
 }
 
-func (ngBlock *NginxBlock) IsBlock(line string) bool {
+// ngBlock *NginxBlock
+func IsBlock(line string) bool {
 	rex := regexp.MustCompile(`{((?:[^{}]|{{[^}]*}})*)}`)
 	out := rex.FindAllStringSubmatch(line, -1)
 	if len(out) != 0 {
@@ -29,12 +30,12 @@ func (ngBlock *NginxBlock) IsBlock(line string) bool {
 	return false
 }
 
-func (ngBlock *NginxBlock) IsLine(line string) bool {
+func IsLine(line string) bool {
 	b, _ := regexp.MatchString(`(\r\n|\r|\n)`, line)
 	return b
 }
 
-func (ngBlock *NginxBlock) HasComment(line string) bool {
+func HasComment(line string) bool {
 	b, _ := regexp.MatchString(`#[^\n\r]+(?:[\n\r]|\*\))$`, line)
 	return b
 }
@@ -88,33 +89,32 @@ func main() {
 
 }
 
-func blockParser(str string) {
-	length := len(str)
-	var stack []int
-	var result []string
-
-	for i := 0; i < length; i++ {
-
-		if str[i] == '{' {
-			stack = append(stack, i)
-		}
-
-		if str[i] == '}' {
-			open := stack[len(stack)-1]
-			fmt.Println(stack)
-			stack = stack[:len(stack)-1]
-			fmt.Println(stack)
-			result = append(result, str[open:i+1])
-			//fmt.Println(str[open: i-open-1])
-		}
-	}
-	fmt.Println("result\n\n\n")
-
-	for i, v := range result {
-		fmt.Println(i)
-		fmt.Println(v)
-	}
-
-	fmt.Println(len(result))
-}
+//func blockParser(str string) {
+//	length := len(str)
+//	var stack []int
+//	var result []string
+//
+//	for i := 0; i < length; i++ {
+//
+//		if str[i] == '{' {
+//			stack = append(stack, i)
+//		}
+//
+//		if str[i] == '}' {
+//			open := stack[len(stack)-1]
+//			fmt.Println(stack)
+//			stack = stack[:len(stack)-1]
+//			fmt.Println(stack)
+//			result = append(result, str[open:i+1])
+//			//fmt.Println(str[open: i-open-1])
+//		}
+//	}
+//
+//	for i, v := range result {
+//		fmt.Println(i)
+//		fmt.Println(v)
+//	}
+//
+//	fmt.Println(len(result))
+//}
 

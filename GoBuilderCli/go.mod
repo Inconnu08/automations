@@ -1,4 +1,4 @@
-module github.com/inconnu08/automations
+module github.com/inconnu08/automations/gobuildercli
 
 go 1.15
 

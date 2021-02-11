@@ -16,11 +16,14 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
 )
 
 var buildexecuteCmd = &cobra.Command{
@@ -36,27 +39,24 @@ to quickly create a Cobra application.`,
 		buildDir, _ := cmd.Flags().GetString("builddir") // copydir will use this
 		copyDir, _ := cmd.Flags().GetString("copydir")
 		exeName, _ := cmd.Flags().GetString("exe")
-		buildexecuteArgs([]string{buildDir, copyDir, exeName})
-		//
-		//if fstatus {
-		//	addFloat(args)
-		//} else {
-		//	addInt(args)
-		//}
 
+		if exeName == "" {
+			log.Fatal("Exe name not provided")
+		}
+
+		buildexecuteArgs(buildDir, copyDir, exeName)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(buildexecuteCmd)
-	buildexecuteCmd.Flags().StringP("builddir", "b", "", "directory specified for build")
-	buildexecuteCmd.Flags().StringP("copydir", "c", "", "copy directory")
+	buildexecuteCmd.Flags().StringP("builddir", "b", "./", "directory specified for build")
+	buildexecuteCmd.Flags().StringP("copydir", "c", "./", "copy directory")
 	buildexecuteCmd.Flags().StringP("exe", "e", "", "directory specified for build")
 }
 
-func buildexecuteArgs(args []string) {
-
-	fmt.Printf("Addition of %s", args)
+func buildexecuteArgs(buildDir, copyDir, exeName string) {
+	//fmt.Printf("Addition of %s", args)
 	//var sources []string
 	//fmt.Println(args[1])
 	//srcs, err := filepath.Glob(args[1])
@@ -66,10 +66,12 @@ func buildexecuteArgs(args []string) {
 	//sources = append(sources, srcs...)
 	//println(sources)
 
+	if err := CopyDir(copyDir, buildDir); err != nil {
+		log.Fatalln(err)
+	}
 
-
+	runBuild(exeName, buildDir)
 }
-
 
 // CopyFile copies the contents of the file named src to the file named
 // by dst. The file will be created if it does not already exist. If the
@@ -119,8 +121,13 @@ func CopyFile(src, dst string) (err error) {
 // Source directory must exist, destination directory must *not* exist.
 // Symlinks are ignored and skipped.
 func CopyDir(src string, dst string) (err error) {
+
 	src = filepath.Clean(src)
 	dst = filepath.Clean(dst)
+
+	if src == dst {
+		return
+	}
 
 	si, err := os.Stat(src)
 	if err != nil {
@@ -134,9 +141,9 @@ func CopyDir(src string, dst string) (err error) {
 	if err != nil && !os.IsNotExist(err) {
 		return
 	}
-	if err == nil {
-		return fmt.Errorf("destination already exists")
-	}
+	//if err == nil {
+	//	return fmt.Errorf("destination already exists")
+	//}
 
 	err = os.MkdirAll(dst, si.Mode())
 	if err != nil {
@@ -171,4 +178,16 @@ func CopyDir(src string, dst string) (err error) {
 	}
 
 	return
+}
+
+func runBuild(name, buildDir string) {
+	buildPath := buildDir + string(filepath.Separator) + name + ".exe"
+
+	cmd := exec.Command("go", "build", "-o", buildPath)
+	//cmd.Dir = "./"+buildDir
+	b, err := cmd.Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(b))
 }

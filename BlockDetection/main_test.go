@@ -48,9 +48,10 @@ func TestHasComment(t *testing.T) {
 		input string
 		want  bool
 	}{
-		{testName: "Test with an actual comment", input: "#this si a comment", want: true},
-		{testName: "Test with double # on comment", input: "##this si also a commnet", want: true},
-		{testName: "Test with not a comment", input: "this si not a commnet", want: false},
+		{testName: "Test with an actual comment", input: "#this is a comment", want: true},
+		{testName: "Test with double # comment", input: "##this si also a comment", want: true},
+		{testName: "Test with space between # and comment", input: "# this si also a comment", want: true},
+		{testName: "Test with not a comment", input: "this si not a comment", want: false},
 	}
 
 	for _, tc := range tests {
@@ -60,4 +61,5 @@ func TestHasComment(t *testing.T) {
 		}
 	}
 }
+
 

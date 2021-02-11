@@ -36,7 +36,7 @@ func IsLine(line string) bool {
 }
 
 func HasComment(line string) bool {
-	b, _ := regexp.MatchString(`#[^\n\r]+(?:[\n\r]|\*\))$`, line)
+	b, _ := regexp.MatchString(`\B(\#\s?[a-zA-Z]+\b)`, line)
 	return b
 }
 
@@ -67,7 +67,7 @@ func GetNginxBlocks(configContent string) *NginxBlocks {
 }
 
 func main() {
-	configContent := `server { # simple reverse-proxy
+	ConfigContent := `server { # simple reverse-proxy
     listen       80;
     server_name  domain2.com www.domain2.com;
     access_log   logs/domain2.access.log  main;
@@ -84,7 +84,7 @@ func main() {
     }
 }`
 
-	ngx := GetNginxBlocks(configContent)
+	ngx := GetNginxBlocks(ConfigContent)
 	fmt.Println(*ngx)
 
 }

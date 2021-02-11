@@ -20,7 +20,8 @@ type NginxBlock struct {
 	TotalBlocksInside int
 }
 
-func (ngBlock *NginxBlock) IsBlock(line string) bool {
+// ngBlock *NginxBlock
+func IsBlock(line string) bool {
 	rex := regexp.MustCompile(`{((?:[^{}]|{{[^}]*}})*)}`)
 	out := rex.FindAllStringSubmatch(line, -1)
 	if len(out) != 0 {
@@ -29,13 +30,13 @@ func (ngBlock *NginxBlock) IsBlock(line string) bool {
 	return false
 }
 
-func (ngBlock *NginxBlock) IsLine(line string) bool {
+func IsLine(line string) bool {
 	b, _ := regexp.MatchString(`(\r\n|\r|\n)`, line)
 	return b
 }
 
-func (ngBlock *NginxBlock) HasComment(line string) bool {
-	b, _ := regexp.MatchString(`#[^\n\r]+(?:[\n\r]|\*\))$`, line)
+func HasComment(line string) bool {
+	b, _ := regexp.MatchString(`\B(\#\s?[a-zA-Z]+\b)`, line)
 	return b
 }
 
@@ -66,7 +67,7 @@ func GetNginxBlocks(configContent string) *NginxBlocks {
 }
 
 func main() {
-	configContent := `server { # simple reverse-proxy
+	ConfigContent := `server { # simple reverse-proxy
     listen       80;
     server_name  domain2.com www.domain2.com;
     access_log   logs/domain2.access.log  main;
@@ -83,38 +84,37 @@ func main() {
     }
 }`
 
-	ngx := GetNginxBlocks(configContent)
+	ngx := GetNginxBlocks(ConfigContent)
 	fmt.Println(*ngx)
 
 }
 
-func blockParser(str string) {
-	length := len(str)
-	var stack []int
-	var result []string
-
-	for i := 0; i < length; i++ {
-
-		if str[i] == '{' {
-			stack = append(stack, i)
-		}
-
-		if str[i] == '}' {
-			open := stack[len(stack)-1]
-			fmt.Println(stack)
-			stack = stack[:len(stack)-1]
-			fmt.Println(stack)
-			result = append(result, str[open:i+1])
-			//fmt.Println(str[open: i-open-1])
-		}
-	}
-	fmt.Println("result\n\n\n")
-
-	for i, v := range result {
-		fmt.Println(i)
-		fmt.Println(v)
-	}
-
-	fmt.Println(len(result))
-}
+//func blockParser(str string) {
+//	length := len(str)
+//	var stack []int
+//	var result []string
+//
+//	for i := 0; i < length; i++ {
+//
+//		if str[i] == '{' {
+//			stack = append(stack, i)
+//		}
+//
+//		if str[i] == '}' {
+//			open := stack[len(stack)-1]
+//			fmt.Println(stack)
+//			stack = stack[:len(stack)-1]
+//			fmt.Println(stack)
+//			result = append(result, str[open:i+1])
+//			//fmt.Println(str[open: i-open-1])
+//		}
+//	}
+//
+//	for i, v := range result {
+//		fmt.Println(i)
+//		fmt.Println(v)
+//	}
+//
+//	fmt.Println(len(result))
+//}
 
